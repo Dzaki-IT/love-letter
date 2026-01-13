@@ -14,50 +14,63 @@ body {
 }
 
 .envelope {
-    width: 300px;
-    height: 200px;
-    background: #fff;
     position: relative;
+    width: 320px;
+    height: 200px;
     cursor: pointer;
-    transition: transform 1s;
 }
 
-.envelope.open {
-    transform: translateY(-50px);
-}
-
-.top {
+.back {
     position: absolute;
-    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #ff6b81;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.front {
+    position: absolute;
     width: 100%;
     height: 100%;
     background: #ff6b81;
     clip-path: polygon(0 0, 100% 0, 50% 50%);
-    z-index: 3;
-    transition: transform 1s;
+    z-index: 4;
+    bottom: 0;
 }
 
-.envelope.open .top {
-    transform: rotateX(180deg);
+.top-flap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ff4757;
+    clip-path: polygon(0 0, 100% 0, 50% 50%);
     transform-origin: top;
+    transition: transform 1s;
+    z-index: 5;
+}
+
+.envelope.open .top-flap {
+    transform: rotateX(180deg);
 }
 
 .letter {
     position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 90%;
     background: #fff;
+    left: 5%;
+    top: 100%;
     padding: 20px;
     box-sizing: border-box;
-    transform: translateY(100%);
-    transition: transform 1s;
-    z-index: 2;
+    border-radius: 5px;
     text-align: center;
+    transition: top 1s;
+    z-index: 3;
 }
 
 .envelope.open .letter {
-    transform: translateY(0);
+    top: 5%;
 }
 
 h2 {
