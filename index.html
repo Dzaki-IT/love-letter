@@ -143,16 +143,18 @@
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             z-index: 3;
-            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             opacity: 0;
             padding: 30px;
             overflow-y: auto;
+            pointer-events: none;
         }
 
         .envelope.open .letter {
-            transform: translate(-50%, -150%);
+            transform: translate(-50%, -180%);
             opacity: 1;
             z-index: 100;
+            pointer-events: auto;
         }
 
         .open-text {
@@ -354,8 +356,8 @@
         /* Floating hearts di background (selalu ada) */
         .bg-heart {
             position: fixed;
-            font-size: 25px;
-            opacity: 0.15;
+            font-size: 35px;
+            opacity: 0.25;
             animation: bg-float 8s infinite;
             z-index: 2;
             pointer-events: none;
@@ -363,9 +365,41 @@
 
         @keyframes bg-float {
             0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-            25% { transform: translateY(-20px) translateX(10px) rotate(5deg); }
-            50% { transform: translateY(0) translateX(20px) rotate(0deg); }
-            75% { transform: translateY(20px) translateX(10px) rotate(-5deg); }
+            25% { transform: translateY(-30px) translateX(15px) rotate(10deg); }
+            50% { transform: translateY(0) translateX(30px) rotate(0deg); }
+            75% { transform: translateY(30px) translateX(15px) rotate(-10deg); }
+        }
+
+        /* Extra floating hearts - banyak banget! */
+        .extra-heart {
+            position: fixed;
+            animation: extra-float 10s infinite;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        @keyframes extra-float {
+            0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) scale(1.5) rotate(360deg); opacity: 0; }
+        }
+
+        /* Rose petals falling */
+        .petal {
+            position: fixed;
+            font-size: 20px;
+            animation: petal-fall 8s infinite;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes petal-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(110vh) translateX(100px) rotate(360deg); opacity: 0; }
         }
 
         /* Responsive */
@@ -429,21 +463,47 @@
     </style>
 </head>
 <body>
-    <!-- Loading overlay -->
-    <!-- LOADING OVERLAY DIHAPUS - LANGSUNG TAMPIL AMPLOP -->
-
-    <!-- Indicator animasi aktif -->
-    <div class="animation-test">✨ Animasi Aktif</div>
-
-    <canvas id="canvas"></canvas>
     
-    <!-- Background hearts (selalu ada) -->
-    <div class="bg-heart" style="top: 10%; left: 10%; animation-delay: 0s;">💕</div>
-    <div class="bg-heart" style="top: 20%; left: 80%; animation-delay: 1s;">❤️</div>
-    <div class="bg-heart" style="top: 70%; left: 15%; animation-delay: 2s;">💖</div>
-    <div class="bg-heart" style="top: 60%; left: 85%; animation-delay: 3s;">💗</div>
-    <div class="bg-heart" style="top: 40%; left: 5%; animation-delay: 4s;">💓</div>
-    <div class="bg-heart" style="top: 80%; left: 75%; animation-delay: 5s;">💝</div>
+    <!-- Background hearts (BANYAK BANGET!) -->
+    <div class="bg-heart" style="top: 10%; left: 10%; animation-delay: 0s; font-size: 40px;">💕</div>
+    <div class="bg-heart" style="top: 20%; left: 80%; animation-delay: 1s; font-size: 35px;">❤️</div>
+    <div class="bg-heart" style="top: 70%; left: 15%; animation-delay: 2s; font-size: 45px;">💖</div>
+    <div class="bg-heart" style="top: 60%; left: 85%; animation-delay: 3s; font-size: 38px;">💗</div>
+    <div class="bg-heart" style="top: 40%; left: 5%; animation-delay: 4s; font-size: 42px;">💓</div>
+    <div class="bg-heart" style="top: 80%; left: 75%; animation-delay: 5s; font-size: 36px;">💝</div>
+    <div class="bg-heart" style="top: 15%; left: 50%; animation-delay: 1.5s; font-size: 40px;">💕</div>
+    <div class="bg-heart" style="top: 85%; left: 40%; animation-delay: 2.5s; font-size: 44px;">❤️</div>
+    <div class="bg-heart" style="top: 50%; left: 90%; animation-delay: 3.5s; font-size: 37px;">💖</div>
+    <div class="bg-heart" style="top: 30%; left: 25%; animation-delay: 4.5s; font-size: 41px;">💗</div>
+
+    <!-- Extra floating hearts yang naik dari bawah -->
+    <div class="extra-heart" style="left: 5%; animation-delay: 0s; font-size: 30px;">❤️</div>
+    <div class="extra-heart" style="left: 15%; animation-delay: 1s; font-size: 35px;">💕</div>
+    <div class="extra-heart" style="left: 25%; animation-delay: 2s; font-size: 28px;">💖</div>
+    <div class="extra-heart" style="left: 35%; animation-delay: 3s; font-size: 32px;">💗</div>
+    <div class="extra-heart" style="left: 45%; animation-delay: 4s; font-size: 30px;">💓</div>
+    <div class="extra-heart" style="left: 55%; animation-delay: 5s; font-size: 33px;">💝</div>
+    <div class="extra-heart" style="left: 65%; animation-delay: 1.5s; font-size: 29px;">❤️</div>
+    <div class="extra-heart" style="left: 75%; animation-delay: 2.5s; font-size: 31px;">💕</div>
+    <div class="extra-heart" style="left: 85%; animation-delay: 3.5s; font-size: 34px;">💖</div>
+    <div class="extra-heart" style="left: 95%; animation-delay: 4.5s; font-size: 30px;">💗</div>
+    <div class="extra-heart" style="left: 10%; animation-delay: 6s; font-size: 32px;">💓</div>
+    <div class="extra-heart" style="left: 30%; animation-delay: 7s; font-size: 28px;">💝</div>
+    <div class="extra-heart" style="left: 50%; animation-delay: 8s; font-size: 35px;">❤️</div>
+    <div class="extra-heart" style="left: 70%; animation-delay: 6.5s; font-size: 31px;">💕</div>
+    <div class="extra-heart" style="left: 90%; animation-delay: 7.5s; font-size: 29px;">💖</div>
+
+    <!-- Rose petals jatuh dari atas -->
+    <div class="petal" style="left: 8%; animation-delay: 0s;">🌸</div>
+    <div class="petal" style="left: 22%; animation-delay: 1.5s;">🌸</div>
+    <div class="petal" style="left: 38%; animation-delay: 3s;">🌸</div>
+    <div class="petal" style="left: 52%; animation-delay: 4.5s;">🌸</div>
+    <div class="petal" style="left: 68%; animation-delay: 2s;">🌸</div>
+    <div class="petal" style="left: 82%; animation-delay: 3.5s;">🌸</div>
+    <div class="petal" style="left: 92%; animation-delay: 5s;">🌸</div>
+    <div class="petal" style="left: 12%; animation-delay: 6s;">🌸</div>
+    <div class="petal" style="left: 42%; animation-delay: 7s;">🌸</div>
+    <div class="petal" style="left: 72%; animation-delay: 6.5s;">🌸</div>
 
     <div class="container">
         <div class="envelope-wrapper" id="envelopeWrapper">
