@@ -1,65 +1,54 @@
-body {
-    margin: 0;
-    height: 100vh;
-    background: linear-gradient(to bottom, #ff9a9e, #fad0c4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Segoe UI', sans-serif;
-    overflow: hidden;
+let musicPlayed = false;
+
+function openEnvelope() {
+    const envelope = document.querySelector('.envelope');
+    envelope.classList.add('open');
+
+    playMusic();
+    createHearts();
 }
 
-.container {
-    position: relative;
+function playMusic() {
+    if (musicPlayed) return;
+
+    const music = document.getElementById('bgMusic');
+    music.volume = 0;
+    music.play();
+
+    // fade in musik
+    let volume = 0;
+    const fade = setInterval(() => {
+        if (volume < 0.8) {
+            volume += 0.02;
+            music.volume = volume;
+        } else {
+            clearInterval(fade);
+        }
+    }, 100);
+
+    musicPlayed = true;
 }
 
-.envelope {
-    width: 300px;
-    height: 200px;
-    background: #fff;
-    position: relative;
-    cursor: pointer;
-    transition: transform 1s;
+function createHearts() {
+    for (let i = 0; i < 25; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.style.position = 'absolute';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.bottom = '-20px';
+        heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+        heart.style.animation = `floatUp ${Math.random() * 3 + 2}s linear`;
+        document.getElementById('hearts').appendChild(heart);
+
+        setTimeout(() => heart.remove(), 5000);
+    }
 }
 
-.envelope.open {
-    transform: translateY(-50px);
-}
-
-.top {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: #ff6b81;
-    clip-path: polygon(0 0, 100% 0, 50% 50%);
-    z-index: 3;
-    transition: transform 1s;
-}
-
-.envelope.open .top {
-    transform: rotateX(180deg);
-    transform-origin: top;
-}
-
-.letter {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    padding: 20px;
-    box-sizing: border-box;
-    transform: translateY(100%);
-    transition: transform 1s;
-    z-index: 2;
-    text-align: center;
-}
-
-.envelope.open .letter {
-    transform: translateY(0);
-}
-
-h2 {
-    color: #ff4d6d;
-}
+// animasi hati
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes floatUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-100vh); opacity: 0; }
+}`;
+document.head.appendChild(style);
