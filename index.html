@@ -2,37 +2,554 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Surat Cinta 💌</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Cinta Untukmu 💌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        /* Amplop */
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope-wrapper.opened {
+            cursor: default;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .envelope-back {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa5c3 100%);
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        .envelope-front {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 100px solid #ff8fb3;
+            top: 0;
+            left: 0;
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 2;
+        }
+
+        .envelope-top {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ff6b9d;
+            top: 0;
+            left: 0;
+            z-index: 4;
+            transform-origin: top;
+            transition: transform 0.8s ease;
+        }
+
+        .envelope.open .envelope-top {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .letter {
+            position: absolute;
+            width: 260px;
+            height: 350px;
+            background: linear-gradient(to bottom, #fff9f9 0%, #fff 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 3;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .envelope.open .letter {
+            transform: translate(-50%, -150%);
+            opacity: 1;
+            z-index: 100;
+        }
+
+        .open-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            z-index: 5;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .envelope.open .open-text {
+            opacity: 0;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Isi Surat */
+        .letter-content {
+            color: #333;
+        }
+
+        .letter-header {
+            font-size: 28px;
+            color: #ff6b9d;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .letter-body {
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .letter-signature {
+            text-align: right;
+            font-style: italic;
+            font-size: 18px;
+            color: #ff6b9d;
+            margin-top: 30px;
+        }
+
+        /* Hati berterbangan */
+        .heart {
+            position: fixed;
+            font-size: 30px;
+            animation: float 6s infinite;
+            opacity: 0.8;
+            z-index: 50;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            z-index: 50;
+            animation: confetti-fall 4s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Stars */
+        .star {
+            position: fixed;
+            font-size: 20px;
+            animation: twinkle 2s infinite;
+            z-index: 50;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Sparkles */
+        .sparkle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle-anim 1.5s infinite;
+            z-index: 50;
+        }
+
+        @keyframes sparkle-anim {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Loading overlay untuk auto-play musik */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-content h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-content p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .envelope-wrapper {
+                width: 250px;
+                height: 166px;
+            }
+            .envelope-back {
+                width: 250px;
+                height: 166px;
+            }
+            .envelope-front {
+                border-left: 125px solid transparent;
+                border-right: 125px solid transparent;
+                border-bottom: 83px solid #ff8fb3;
+            }
+            .envelope-top {
+                border-left: 125px solid transparent;
+                border-right: 125px solid transparent;
+                border-top: 83px solid #ff6b9d;
+            }
+            .letter {
+                width: 220px;
+                height: 300px;
+                padding: 20px;
+            }
+            .letter-header {
+                font-size: 22px;
+            }
+            .letter-body {
+                font-size: 14px;
+            }
+            .open-text {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="envelope" onclick="openEnvelope()">
-        <audio id="bgMusic" loop>
-            <source src="love.mp3" type="audio/mpeg">
-        </audio>
-            
-        <div class="back"></div>
-        <div class="letter">
-            <h2>💌 Untuk Kamu</h2>
-            <p>
-                Hai sayangku,<br><br>
-                Terima kasih sudah hadir
-                dan membuat hariku lebih berwarna.
-                Aku mungkin tak sempurna,
-                tapi cintaku untukmu nyata ❤️<br><br>
-                Dengan cinta,<br>
-                Aku
-            </p>
+    <!-- Loading overlay untuk auto-play musik -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <h2>💕 Memuat Surat Cinta... 💕</h2>
+            <p>Klik di mana saja untuk melanjutkan</p>
         </div>
-        <div class="front"></div>
-        <div class="top-flap"></div>
     </div>
-</div>
 
-<div id="hearts"></div>
+    <canvas id="canvas"></canvas>
+    
+    <div class="container">
+        <div class="envelope-wrapper" id="envelopeWrapper">
+            <div class="envelope" id="envelope">
+                <div class="envelope-back"></div>
+                <div class="envelope-front"></div>
+                <div class="open-text">💌 Buka Aku 💌</div>
+                <div class="envelope-top"></div>
+                <div class="letter" id="letter">
+                    <div class="letter-content">
+                        <div class="letter-header">Untuk Cintaku ❤️</div>
+                        <div class="letter-body">
+                            <!-- ==========================================
+                                 EDIT BAGIAN INI UNTUK PESAN CINTAMU
+                                 ========================================== -->
+                            <p>Hai Sayangku,</p>
+                            <p>Setiap hari bersamamu adalah anugerah terindah dalam hidupku. Kamu adalah alasan di balik senyumku, kekuatan di saat aku lemah, dan cahaya di setiap kegelapan.</p>
+                            <p>Aku mencintaimu bukan karena siapa dirimu, tapi karena siapa diriku saat bersamamu. Kamu membuat dunia ini menjadi tempat yang lebih indah.</p>
+                            <p>Terima kasih telah menjadi bagian dari hidupku. Aku berjanji akan selalu ada untukmu, dalam suka maupun duka.</p>
+                            <p>I love you more than words can say. ❤️</p>
+                            <!-- ========================================== -->
+                        </div>
+                        <div class="letter-signature">
+                            Dengan cinta,<br>
+                            Orang yang mencintaimu ❤️
+                            <!-- Edit bagian signature di atas dengan namamu -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script src="script.js"></script>
+    <!-- Audio -->
+    <audio id="bgMusic" loop>
+        <!-- ==========================================
+             EDIT LINK MUSIK DI SINI
+             Ganti src dengan link musik YouTube yang sudah diconvert ke MP3
+             Atau gunakan musik dari situs seperti:
+             - https://www.bensound.com (free music)
+             - Upload MP3 ke GitHub repository kamu
+             ========================================== -->
+        <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_4a462c27b0.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const envelope = document.getElementById('envelope');
+        const envelopeWrapper = document.getElementById('envelopeWrapper');
+        const bgMusic = document.getElementById('bgMusic');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        let isOpen = false;
+        let musicStarted = false;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Auto-play musik saat halaman dimuat
+        function initMusic() {
+            if (!musicStarted) {
+                bgMusic.play().then(() => {
+                    musicStarted = true;
+                    loadingOverlay.classList.add('hidden');
+                }).catch(() => {
+                    // Jika auto-play gagal, tunggu user click
+                    console.log('Tunggu interaksi user untuk memutar musik');
+                });
+            }
+        }
+
+        // Coba auto-play saat load
+        window.addEventListener('load', () => {
+            setTimeout(initMusic, 500);
+        });
+
+        // Jika auto-play gagal, play saat user click di mana saja
+        loadingOverlay.addEventListener('click', () => {
+            initMusic();
+        });
+
+        // Buka amplop
+        envelopeWrapper.addEventListener('click', () => {
+            if (!isOpen) {
+                // Pastikan musik jalan
+                if (!musicStarted) {
+                    initMusic();
+                }
+                
+                envelope.classList.add('open');
+                envelopeWrapper.classList.add('opened');
+                isOpen = true;
+                createMassiveHearts();
+                createConfetti();
+                createStars();
+            }
+        });
+
+        // Floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 7000);
+        }
+
+        function createMassiveHearts() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => createHeart(), i * 100);
+            }
+        }
+
+        // Continuous hearts
+        setInterval(createHeart, 800);
+
+        // Confetti
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#ffa5c3', '#ffdd00', '#ff3366', '#9966ff', '#00ccff'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                    confetti.style.animationDelay = Math.random() + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 30);
+            }
+        }
+
+        // Stars
+        function createStars() {
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.innerHTML = '✨';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(star);
+            }
+        }
+
+        // Sparkles di background
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            document.body.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), 1500);
+        }
+
+        setInterval(createSparkle, 200);
+
+        // Canvas animation - floating particles
+        const particles = [];
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = `rgba(255, ${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, ${Math.random() * 0.5 + 0.3})`;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 100; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+        
+        // Initial sparkles
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createSparkle, i * 100);
+        }
+    </script>
 </body>
 </html>
